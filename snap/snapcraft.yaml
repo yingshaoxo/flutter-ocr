@@ -8,19 +8,17 @@ description: This is an app to help you convert image to text by using Deep Lear
 confinement: strict
 base: core18
 
+architectures:
+- build-on: amd64
+
 parts:
   yingshaoxo-ocr:
     plugin: python
     python-version: python3
     source: .
-    #python-packages: [easyocr]
-    #
-    #easyocr:
-    #  plugin: python
-    #  python-version: python3
-    #  source: https://github.com/JaidedAI/EasyOCR.git
-    #  stage-packages:
-    #    - python-six
+    python-packages: [torch, opencv-python, scipy, numpy, Pillow, scikit-image, python-bidi, easyocr]
+    stage-packages:
+      - libgomp1
   flutter-ocr:
     plugin: flutter
     #source: https://github.com/yingshaoxo/flutter-ocr.git
@@ -34,10 +32,20 @@ slots:
     name: com.example.flutter_ocr
 
 apps:
-  yingshaoxo-ocr:
-    command: usr/bin/python3 $SNAP/bin/ocr_server
   flutter-ocr:
-    command: bin/flutter_ocr
+    command: usr/bin/python3 $SNAP/bin/ocr_server.py
     extensions: [flutter-dev]
     slots:
       - dbus-flutter-ocr
+
+plugs:
+  desktop:
+  desktop-legacy:
+  x11:
+  unity7:
+  wayland:
+  opengl:
+  home:
+  process-control:
+  network-bind:
+  network:

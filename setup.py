@@ -35,5 +35,5 @@ setup(name='flutter_ocr_server',
       ],
       include_package_data=False,
       packages=find_packages(),
-      scripts=['bin/ocr_server'],
+      scripts=['ocr_server.py'],
       )

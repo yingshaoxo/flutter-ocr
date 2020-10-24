@@ -9,6 +9,18 @@ confinement: strict
 base: core18
 
 parts:
+  yingshaoxo-ocr:
+    plugin: python
+    python-version: python3
+    source: .
+    #python-packages: [easyocr]
+    #
+    #easyocr:
+    #  plugin: python
+    #  python-version: python3
+    #  source: https://github.com/JaidedAI/EasyOCR.git
+    #  stage-packages:
+    #    - python-six
   flutter-ocr:
     plugin: flutter
     #source: https://github.com/yingshaoxo/flutter-ocr.git
@@ -22,6 +34,8 @@ slots:
     name: com.example.flutter_ocr
 
 apps:
+  yingshaoxo-ocr:
+    command: usr/bin/python3 $SNAP/bin/ocr_server
   flutter-ocr:
     command: bin/flutter_ocr
     extensions: [flutter-dev]

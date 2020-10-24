@@ -1,3 +1,5 @@
+# if you got any error when building this, just run snapcraft build --debug
+# then delete the whole folder of flutter_ocr under parts folder
 name: flutter-ocr
 version: '1.0'
 summary: Let's release the OCR power of Python with the support of flutter.
@@ -9,10 +11,19 @@ base: core18
 parts:
   flutter-ocr:
     plugin: flutter
-    source: https://github.com/yingshaoxo/flutter-ocr
+    #source: https://github.com/yingshaoxo/flutter-ocr.git
+    source: .
     flutter-target: lib/main.dart
+
+slots:
+  dbus-flutter-ocr:
+    interface: dbus
+    bus: session
+    name: com.example.flutter_ocr
 
 apps:
   flutter-ocr:
-    command: flutter-ocr
+    command: bin/flutter_ocr
     extensions: [flutter-dev]
+    slots:
+      - dbus-flutter-ocr

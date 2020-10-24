@@ -1,3 +1,5 @@
+*.snap
+*.vscode
 # Miscellaneous
 *.class
 *.log

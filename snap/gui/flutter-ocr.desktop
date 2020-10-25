@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=v1.0
+Name=flutter-ocr
+GenericName=flutter-ocr
+Comment=Open Source flutter ocr Application
+Exec=flutter-ocr
+Icon=${SNAP}/meta/gui/icon.png
+Type=Application
+Categories=Utility;
+StartupWMClass=UGENE

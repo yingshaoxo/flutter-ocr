@@ -1,6 +1,10 @@
+import 'dart:wasm';
+
 import 'package:file_picker_cross/file_picker_cross.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'dart:io';
+import 'dart:convert';
 
 import 'package:grpc/grpc.dart';
 import 'server.pb.dart';
@@ -69,8 +73,46 @@ class MyHomePage extends StatefulWidget {
   _MyHomePageState createState() => _MyHomePageState();
 }
 
+final spinkit1 = Scaffold(
+    appBar: null,
+    backgroundColor: Colors.white,
+    body: SpinKitFadingCube(
+      size: 100,
+      itemBuilder: (BuildContext context, int index) {
+        return DecoratedBox(
+          decoration: BoxDecoration(
+            color: index.isEven ? Colors.red : Colors.green,
+          ),
+        );
+      },
+    ));
+
+final spinkit2 = Scaffold(
+    appBar: null,
+    backgroundColor: Colors.purple,
+    body: SpinKitRing(
+      size: 100,
+      color: Colors.white,
+    ));
+
 class _MyHomePageState extends State<MyHomePage> {
   bool loading_finished = false;
+  String file_path = "";
+  String detected_text = "";
+
+  bool wating = false;
+
+  var input_controller;
+
+  void initState() {
+    super.initState();
+    input_controller = TextEditingController();
+  }
+
+  void dispose() {
+    input_controller.dispose();
+    super.dispose();
+  }
 
   @override
   void didChangeDependencies() async {
@@ -89,49 +131,73 @@ class _MyHomePageState extends State<MyHomePage> {
     super.didChangeDependencies();
   }
 
+  void do_the_scan() async {
+    final response = await stub.scan(TextRequest()..text = file_path);
+    print(response.text);
+    //Map<String, dynamic> data = jsonDecode(response.text);
+    Map data = jsonDecode(response.text);
+    setState(() {
+      detected_text = data["text"];
+      wating = false;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
-
-    Widget center_widget;
+    Widget left_part_widget;
     if (loading_finished) {
-      center_widget = Text(
-        'We will let you select image files soon.',
+      left_part_widget = Text(
+        'You can click the right bottom button to select an image to start your OCR journey.',
       );
     } else {
-      center_widget = Text("Loading...");
+      left_part_widget = Text("Loading...");
+      return spinkit1;
     }
+
+    if (wating) {
+      return spinkit2;
+    }
+
+    if (file_path != "") {
+      left_part_widget = Image.file(new File(file_path));
+    }
+
+    input_controller.value = input_controller.value.copyWith(
+      text: detected_text,
+    );
+
     return Scaffold(
       appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
       ),
       body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
+        child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[center_widget],
+          children: <Widget>[
+            Expanded(
+                flex: 1,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [left_part_widget],
+                )),
+            Expanded(
+              flex: 1,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextField(
+                    controller: input_controller,
+                    minLines: null,
+                    maxLines: null,
+                    expands: true,
+                    obscureText: false,
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(10)),
+                      ),
+                    )),
+              ),
+            ),
+          ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
@@ -144,6 +210,11 @@ class _MyHomePageState extends State<MyHomePage> {
             );
             print(myFile.fileName);
             print(myFile.path);
+            setState(() {
+              file_path = myFile.path;
+              wating = true;
+            });
+            do_the_scan();
           } catch (e) {
             print(e);
           }

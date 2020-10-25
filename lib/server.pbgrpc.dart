@@ -22,6 +22,10 @@ class OCR_ServerClient extends $grpc.Client {
       '/OCR_Server/Load',
       ($0.TextRequest value) => value.writeToBuffer(),
       ($core.List<$core.int> value) => $0.TextReply.fromBuffer(value));
+  static final _$scan = $grpc.ClientMethod<$0.TextRequest, $0.TextReply>(
+      '/OCR_Server/Scan',
+      ($0.TextRequest value) => value.writeToBuffer(),
+      ($core.List<$core.int> value) => $0.TextReply.fromBuffer(value));
 
   OCR_ServerClient($grpc.ClientChannel channel, {$grpc.CallOptions options})
       : super(channel, options: options);
@@ -36,6 +40,13 @@ class OCR_ServerClient extends $grpc.Client {
   $grpc.ResponseFuture<$0.TextReply> load($0.TextRequest request,
       {$grpc.CallOptions options}) {
     final call = $createCall(_$load, $async.Stream.fromIterable([request]),
+        options: options);
+    return $grpc.ResponseFuture(call);
+  }
+
+  $grpc.ResponseFuture<$0.TextReply> scan($0.TextRequest request,
+      {$grpc.CallOptions options}) {
+    final call = $createCall(_$scan, $async.Stream.fromIterable([request]),
         options: options);
     return $grpc.ResponseFuture(call);
   }
@@ -59,6 +70,13 @@ abstract class OCR_ServerServiceBase extends $grpc.Service {
         false,
         ($core.List<$core.int> value) => $0.TextRequest.fromBuffer(value),
         ($0.TextReply value) => value.writeToBuffer()));
+    $addMethod($grpc.ServiceMethod<$0.TextRequest, $0.TextReply>(
+        'Scan',
+        scan_Pre,
+        false,
+        false,
+        ($core.List<$core.int> value) => $0.TextRequest.fromBuffer(value),
+        ($0.TextReply value) => value.writeToBuffer()));
   }
 
   $async.Future<$0.TextReply> print_Pre(
@@ -71,8 +89,15 @@ abstract class OCR_ServerServiceBase extends $grpc.Service {
     return load(call, await request);
   }
 
+  $async.Future<$0.TextReply> scan_Pre(
+      $grpc.ServiceCall call, $async.Future<$0.TextRequest> request) async {
+    return scan(call, await request);
+  }
+
   $async.Future<$0.TextReply> print(
       $grpc.ServiceCall call, $0.TextRequest request);
   $async.Future<$0.TextReply> load(
+      $grpc.ServiceCall call, $0.TextRequest request);
+  $async.Future<$0.TextReply> scan(
       $grpc.ServiceCall call, $0.TextRequest request);
 }

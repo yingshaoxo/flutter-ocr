@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto3',
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x0cserver.proto\"\x1b\n\x0bTextRequest\x12\x0c\n\x04text\x18\x01 \x01(\t\"\x19\n\tTextReply\x12\x0c\n\x04text\x18\x01 \x01(\t2U\n\nOCR_Server\x12#\n\x05Print\x12\x0c.TextRequest\x1a\n.TextReply\"\x00\x12\"\n\x04Load\x12\x0c.TextRequest\x1a\n.TextReply\"\x00\x62\x06proto3'
+  serialized_pb=b'\n\x0cserver.proto\"\x1b\n\x0bTextRequest\x12\x0c\n\x04text\x18\x01 \x01(\t\"\x19\n\tTextReply\x12\x0c\n\x04text\x18\x01 \x01(\t2y\n\nOCR_Server\x12#\n\x05Print\x12\x0c.TextRequest\x1a\n.TextReply\"\x00\x12\"\n\x04Load\x12\x0c.TextRequest\x1a\n.TextReply\"\x00\x12\"\n\x04Scan\x12\x0c.TextRequest\x1a\n.TextReply\"\x00\x62\x06proto3'
 )
 
 
@@ -116,7 +116,7 @@ _OCR_SERVER = _descriptor.ServiceDescriptor(
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
   serialized_start=72,
-  serialized_end=157,
+  serialized_end=193,
   methods=[
   _descriptor.MethodDescriptor(
     name='Print',
@@ -132,6 +132,16 @@ _OCR_SERVER = _descriptor.ServiceDescriptor(
     name='Load',
     full_name='OCR_Server.Load',
     index=1,
+    containing_service=None,
+    input_type=_TEXTREQUEST,
+    output_type=_TEXTREPLY,
+    serialized_options=None,
+    create_key=_descriptor._internal_create_key,
+  ),
+  _descriptor.MethodDescriptor(
+    name='Scan',
+    full_name='OCR_Server.Scan',
+    index=2,
     containing_service=None,
     input_type=_TEXTREQUEST,
     output_type=_TEXTREPLY,

@@ -5,6 +5,7 @@ syntax = "proto3";
 service OCR_Server {
   rpc Print (TextRequest) returns (TextReply) {}
   rpc Load (TextRequest) returns (TextReply) {}
+  rpc Scan (TextRequest) returns (TextReply) {}
   //rpc GetAudio (AudioInfo) returns (stream Audio) {}
 }
 

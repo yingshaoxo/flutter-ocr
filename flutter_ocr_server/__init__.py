@@ -46,7 +46,7 @@ class OCR():
         return self._raw_to_mature(self.reader.readtext(file_path))
 
 
-class Server(server_pb2_grpc.OCR_Server):
+class Server(server_pb2_grpc.OCR_Service):
     def __init__(self):
         self.ocr = OCR()
         super().__init__()
@@ -75,7 +75,7 @@ class Server(server_pb2_grpc.OCR_Server):
     def start(self):
         global server, reader
         server = grpc.server(futures.ThreadPoolExecutor(max_workers=5))
-        server_pb2_grpc.add_OCR_ServerServicer_to_server(Server(), server)
+        server_pb2_grpc.add_OCR_ServiceServicer_to_server(Server(), server)
         server.add_insecure_port('[::]:50051')
         server.start()
         print("server started.")

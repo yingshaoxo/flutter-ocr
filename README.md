@@ -12,3 +12,13 @@ ___
 ___
 * https://snapcraft.io/#python
 * https://snapcraft.io/#flutter
+
+### Plan to use
+https://github.com/Belval/pdf2image
+https://realpython.com/creating-modifying-pdf/#installing-reportlab
+
+___
+
+https://pub.dev/packages/native_pdf_renderer
+https://pub.dev/packages/pdf
+https://pub.dev/packages/native_pdf_view

@@ -1,35 +1,15 @@
-import 'dart:wasm';
-
 import 'package:file_picker_cross/file_picker_cross.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'dart:io';
-import 'dart:convert';
 
-import 'package:grpc/grpc.dart';
-import 'server.pb.dart';
-import 'server.pbgrpc.dart';
+import 'server.dart';
 
-final channel = ClientChannel(
-  'localhost',
-  port: 50051,
-  options: const ChannelOptions(credentials: ChannelCredentials.insecure()),
-);
-final stub = OCR_ServerClient(channel);
+final service = Service();
 
 Future<void> main(List<String> args) async {
-  try {
-    final response = await stub.print(TextRequest()..text = "client started.");
-    print(response.text);
-  } on GrpcError {
-    print("an grpc error");
-  } catch (e) {
-    print(e);
-  }
-
+  service.say_hi();
   runApp(MyApp());
-
-  //await channel.shutdown();
 }
 
 class MyApp extends StatelessWidget {
@@ -118,8 +98,7 @@ class _MyHomePageState extends State<MyHomePage> {
   void didChangeDependencies() async {
     if (!loading_finished) {
       try {
-        final response = await stub.load(TextRequest()..text = "");
-        if (response.text == "ok") {
+        if (await service.load()) {
           setState(() {
             loading_finished = true;
           });
@@ -132,12 +111,10 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void do_the_scan() async {
-    final response = await stub.scan(TextRequest()..text = file_path);
-    print(response.text);
-    //Map<String, dynamic> data = jsonDecode(response.text);
-    Map data = jsonDecode(response.text);
+    var text = await service.scan(file_path);
+    print(text);
     setState(() {
-      detected_text = data["text"];
+      detected_text = text;
       wating = false;
     });
   }

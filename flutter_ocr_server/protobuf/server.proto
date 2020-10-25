@@ -2,7 +2,7 @@
 //protoc --proto_path=. --js_out=import_style=commonjs,binary:. everyday.proto	
 syntax = "proto3";
 
-service OCR_Server {
+service OCR_Service {
   rpc Print (TextRequest) returns (TextReply) {}
   rpc Load (TextRequest) returns (TextReply) {}
   rpc Scan (TextRequest) returns (TextReply) {}

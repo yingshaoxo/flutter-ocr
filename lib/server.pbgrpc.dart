@@ -13,21 +13,21 @@ import 'package:grpc/service_api.dart' as $grpc;
 import 'server.pb.dart' as $0;
 export 'server.pb.dart';
 
-class OCR_ServerClient extends $grpc.Client {
+class OCR_ServiceClient extends $grpc.Client {
   static final _$print = $grpc.ClientMethod<$0.TextRequest, $0.TextReply>(
-      '/OCR_Server/Print',
+      '/OCR_Service/Print',
       ($0.TextRequest value) => value.writeToBuffer(),
       ($core.List<$core.int> value) => $0.TextReply.fromBuffer(value));
   static final _$load = $grpc.ClientMethod<$0.TextRequest, $0.TextReply>(
-      '/OCR_Server/Load',
+      '/OCR_Service/Load',
       ($0.TextRequest value) => value.writeToBuffer(),
       ($core.List<$core.int> value) => $0.TextReply.fromBuffer(value));
   static final _$scan = $grpc.ClientMethod<$0.TextRequest, $0.TextReply>(
-      '/OCR_Server/Scan',
+      '/OCR_Service/Scan',
       ($0.TextRequest value) => value.writeToBuffer(),
       ($core.List<$core.int> value) => $0.TextReply.fromBuffer(value));
 
-  OCR_ServerClient($grpc.ClientChannel channel, {$grpc.CallOptions options})
+  OCR_ServiceClient($grpc.ClientChannel channel, {$grpc.CallOptions options})
       : super(channel, options: options);
 
   $grpc.ResponseFuture<$0.TextReply> print($0.TextRequest request,
@@ -52,10 +52,10 @@ class OCR_ServerClient extends $grpc.Client {
   }
 }
 
-abstract class OCR_ServerServiceBase extends $grpc.Service {
-  $core.String get $name => 'OCR_Server';
+abstract class OCR_ServiceBase extends $grpc.Service {
+  $core.String get $name => 'OCR_Service';
 
-  OCR_ServerServiceBase() {
+  OCR_ServiceBase() {
     $addMethod($grpc.ServiceMethod<$0.TextRequest, $0.TextReply>(
         'Print',
         print_Pre,

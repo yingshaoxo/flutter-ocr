@@ -5,7 +5,7 @@ import grpc
 import server_pb2 as server__pb2
 
 
-class OCR_ServerStub(object):
+class OCR_ServiceStub(object):
     """Missing associated documentation comment in .proto file."""
 
     def __init__(self, channel):
@@ -15,23 +15,23 @@ class OCR_ServerStub(object):
             channel: A grpc.Channel.
         """
         self.Print = channel.unary_unary(
-                '/OCR_Server/Print',
+                '/OCR_Service/Print',
                 request_serializer=server__pb2.TextRequest.SerializeToString,
                 response_deserializer=server__pb2.TextReply.FromString,
                 )
         self.Load = channel.unary_unary(
-                '/OCR_Server/Load',
+                '/OCR_Service/Load',
                 request_serializer=server__pb2.TextRequest.SerializeToString,
                 response_deserializer=server__pb2.TextReply.FromString,
                 )
         self.Scan = channel.unary_unary(
-                '/OCR_Server/Scan',
+                '/OCR_Service/Scan',
                 request_serializer=server__pb2.TextRequest.SerializeToString,
                 response_deserializer=server__pb2.TextReply.FromString,
                 )
 
 
-class OCR_ServerServicer(object):
+class OCR_ServiceServicer(object):
     """Missing associated documentation comment in .proto file."""
 
     def Print(self, request, context):
@@ -53,7 +53,7 @@ class OCR_ServerServicer(object):
         raise NotImplementedError('Method not implemented!')
 
 
-def add_OCR_ServerServicer_to_server(servicer, server):
+def add_OCR_ServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'Print': grpc.unary_unary_rpc_method_handler(
                     servicer.Print,
@@ -72,12 +72,12 @@ def add_OCR_ServerServicer_to_server(servicer, server):
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'OCR_Server', rpc_method_handlers)
+            'OCR_Service', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
 
 
  # This class is part of an EXPERIMENTAL API.
-class OCR_Server(object):
+class OCR_Service(object):
     """Missing associated documentation comment in .proto file."""
 
     @staticmethod
@@ -91,7 +91,7 @@ class OCR_Server(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/OCR_Server/Print',
+        return grpc.experimental.unary_unary(request, target, '/OCR_Service/Print',
             server__pb2.TextRequest.SerializeToString,
             server__pb2.TextReply.FromString,
             options, channel_credentials,
@@ -108,7 +108,7 @@ class OCR_Server(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/OCR_Server/Load',
+        return grpc.experimental.unary_unary(request, target, '/OCR_Service/Load',
             server__pb2.TextRequest.SerializeToString,
             server__pb2.TextReply.FromString,
             options, channel_credentials,
@@ -125,7 +125,7 @@ class OCR_Server(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/OCR_Server/Scan',
+        return grpc.experimental.unary_unary(request, target, '/OCR_Service/Scan',
             server__pb2.TextRequest.SerializeToString,
             server__pb2.TextReply.FromString,
             options, channel_credentials,

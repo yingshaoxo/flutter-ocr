@@ -23,6 +23,9 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  file_picker_cross: ^4.2.6
+  protobuf: ^1.0.1
+  grpc: ^2.3.0
 
 
   # The following adds the Cupertino Icons font to your application.

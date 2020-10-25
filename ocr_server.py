@@ -8,14 +8,10 @@ from multiprocessing import Process
 
 server = Server()
 
-def a_fake_server():
-    while 1:
-        server.print()
-        sleep(1)
-
-
-p = Process(target=a_fake_server, args=())
+p = Process(target=server.start, args=())
 p.start()
+
+sleep(0.5)
 
 os.system("$SNAP/bin/flutter_ocr")
 

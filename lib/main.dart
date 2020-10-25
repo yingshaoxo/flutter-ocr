@@ -1,7 +1,31 @@
+import 'package:file_picker_cross/file_picker_cross.dart';
 import 'package:flutter/material.dart';
+import 'dart:io';
 
-void main() async {
+import 'package:grpc/grpc.dart';
+import 'server.pb.dart';
+import 'server.pbgrpc.dart';
+
+final channel = ClientChannel(
+  'localhost',
+  port: 50051,
+  options: const ChannelOptions(credentials: ChannelCredentials.insecure()),
+);
+final stub = OCR_ServerClient(channel);
+
+Future<void> main(List<String> args) async {
+  try {
+    final response = await stub.print(TextRequest()..text = "client started.");
+    print(response.text);
+  } on GrpcError {
+    print("an grpc error");
+  } catch (e) {
+    print(e);
+  }
+
   runApp(MyApp());
+
+  //await channel.shutdown();
 }
 
 class MyApp extends StatelessWidget {
@@ -46,6 +70,25 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  bool loading_finished = false;
+
+  @override
+  void didChangeDependencies() async {
+    if (!loading_finished) {
+      try {
+        final response = await stub.load(TextRequest()..text = "");
+        if (response.text == "ok") {
+          setState(() {
+            loading_finished = true;
+          });
+        }
+      } catch (e) {
+        print('Caught error: $e');
+      }
+    } else {}
+    super.didChangeDependencies();
+  }
+
   @override
   Widget build(BuildContext context) {
     // This method is rerun every time setState is called, for instance as done
@@ -54,6 +97,15 @@ class _MyHomePageState extends State<MyHomePage> {
     // The Flutter framework has been optimized to make rerunning build methods
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
+
+    Widget center_widget;
+    if (loading_finished) {
+      center_widget = Text(
+        'We will let you select image files soon.',
+      );
+    } else {
+      center_widget = Text("Loading...");
+    }
     return Scaffold(
       appBar: AppBar(
         // Here we take the value from the MyHomePage object that was created by
@@ -79,15 +131,23 @@ class _MyHomePageState extends State<MyHomePage> {
           // axis because Columns are vertical (the cross axis would be
           // horizontal).
           mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'We will let you select image files soon.',
-            ),
-          ],
+          children: <Widget>[center_widget],
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () async {
+          // show a dialog to open a file
+          try {
+            FilePickerCross myFile = await FilePickerCross.importFromStorage(
+              type: FileTypeCross
+                  .image, // Available: `any`, `audio`, `image`, `video`, `custom`. Note: not available using FDE
+            );
+            print(myFile.fileName);
+            print(myFile.path);
+          } catch (e) {
+            print(e);
+          }
+        },
         tooltip: 'Add files',
         child: Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.

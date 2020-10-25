@@ -1,5 +1,10 @@
-# if you got any error when building this, just run snapcraft build --debug
+# if you got any error when building this, just run snapcraft --debug
 # then delete the whole folder of flutter_ocr under parts folder
+#
+#sudo systemctl stop snap.multipass.multipassd.service
+#sudo vim /var/snap/multipass/common/data/multipassd/multipassd-vm-instances.json
+#sudo systemctl start snap.multipass.multipassd.service
+#
 name: flutter-ocr
 version: '1.0'
 summary: Let's release the OCR power of Python with the support of flutter.
@@ -16,9 +21,13 @@ parts:
     plugin: python
     python-version: python3
     source: .
-    python-packages: [torch, opencv-python, scipy, numpy, Pillow, scikit-image, python-bidi, easyocr]
+    python-packages: [torch, opencv-python, scipy, numpy, Pillow, scikit-image, python-bidi, easyocr, grpcio, protobuf]
     stage-packages:
       - libgomp1
+        #build-packages:
+        #  - libcrystalhd-dev
+        #  - nvidia-cuda-dev
+        #  - nvidia-cuda-toolkit
   flutter-ocr:
     plugin: flutter
     #source: https://github.com/yingshaoxo/flutter-ocr.git

@@ -1,0 +1,25 @@
+//protoc --python_out=. everyday.proto	
+//protoc --proto_path=. --js_out=import_style=commonjs,binary:. everyday.proto	
+syntax = "proto3";
+
+service OCR_Server {
+  rpc Print (TextRequest) returns (TextReply) {}
+  rpc Load (TextRequest) returns (TextReply) {}
+  //rpc GetAudio (AudioInfo) returns (stream Audio) {}
+}
+
+message TextRequest {
+  string text = 1;
+}
+
+message TextReply {
+  string text = 1;
+}
+
+//message Audio {
+//  bytes data = 1;
+//}
+//
+//message AudioInfo {
+//  float length = 1; //second
+//}

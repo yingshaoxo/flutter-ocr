@@ -3,55 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'dart:io';
 
+import 'package:google_nav_bar/google_nav_bar.dart';
+import 'package:line_icons/line_icons.dart';
+
+import 'package:desktop_window/desktop_window.dart';
+
 import 'server.dart';
 
 final service = Service();
-
-Future<void> main(List<String> args) async {
-  service.say_hi();
-  runApp(MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter OCR',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
-        primarySwatch: Colors.purple,
-      ),
-      home: MyHomePage(title: 'Flutter OCR'),
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
-
-  @override
-  _MyHomePageState createState() => _MyHomePageState();
-}
 
 final spinkit1 = Scaffold(
     appBar: null,
@@ -75,24 +34,27 @@ final spinkit2 = Scaffold(
       color: Colors.white,
     ));
 
-class _MyHomePageState extends State<MyHomePage> {
+Future<void> main(List<String> args) async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await DesktopWindow.setMinWindowSize(Size(960, 640));
+
+  service.say_hi();
+  runApp(MaterialApp(
+    title: 'Flutter OCR',
+    theme: ThemeData(
+      primarySwatch: Colors.purple,
+    ),
+    home: MyApp(),
+  ));
+}
+
+class MyApp extends StatefulWidget {
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
   bool loading_finished = false;
-  String file_path = "";
-  String detected_text = "";
-
-  bool wating = false;
-
-  var input_controller;
-
-  void initState() {
-    super.initState();
-    input_controller = TextEditingController();
-  }
-
-  void dispose() {
-    input_controller.dispose();
-    super.dispose();
-  }
 
   @override
   void didChangeDependencies() async {
@@ -110,6 +72,124 @@ class _MyHomePageState extends State<MyHomePage> {
     super.didChangeDependencies();
   }
 
+  @override
+  Widget build(BuildContext context) {
+    if (!loading_finished) {
+      return spinkit1;
+    }
+
+    return Tabs();
+  }
+}
+
+class Tabs extends StatefulWidget {
+  Tabs({
+    Key key,
+  }) : super(key: key);
+
+  @override
+  _TabsState createState() => _TabsState();
+}
+
+class _TabsState extends State<Tabs> {
+  int _selectedIndex = 0;
+  static const TextStyle optionStyle =
+      TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
+  static List<Widget> _widgetOptions = <Widget>[
+    MyHomePage(),
+    Text(
+      'Index 1: PDF',
+      style: optionStyle,
+    ),
+    Text(
+      'Index 2: History',
+      style: optionStyle,
+    ),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Flutter OCR'),
+      ),
+      body: Center(
+        child: _widgetOptions.elementAt(_selectedIndex),
+      ),
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(color: Colors.white, boxShadow: [
+          BoxShadow(blurRadius: 20, color: Colors.black.withOpacity(.1))
+        ]),
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 8),
+            child: GNav(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                gap: 0,
+                activeColor: Colors.white,
+                iconSize: 36,
+                padding: EdgeInsets.symmetric(horizontal: 150, vertical: 5),
+                duration: Duration(milliseconds: 800),
+                //tabBackgroundColor: Colors.grey[400],
+                tabBackgroundColor: Colors.purple,
+                //backgroundColor: Colors.purple,
+                color: Colors.purple,
+                tabs: [
+                  GButton(
+                    //borderRadius: BorderRadius.all(Radius.circular(5)),
+                    icon: LineIcons.image,
+                    text: 'Image',
+                  ),
+                  GButton(
+                    //borderRadius: BorderRadius.all(Radius.circular(5)),
+                    icon: LineIcons.file_pdf_o,
+                    text: 'PDF',
+                  ),
+                  GButton(
+                    icon: LineIcons.history,
+                    text: 'History',
+                  ),
+                ],
+                selectedIndex: _selectedIndex,
+                onTabChange: (index) {
+                  setState(() {
+                    _selectedIndex = index;
+                  });
+                }),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class MyHomePage extends StatefulWidget {
+  MyHomePage({
+    Key key,
+  }) : super(key: key);
+
+  @override
+  _MyHomePageState createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  String file_path = "";
+  String detected_text = "";
+
+  bool wating = false;
+
+  var input_controller;
+
+  void initState() {
+    super.initState();
+    input_controller = TextEditingController();
+  }
+
+  void dispose() {
+    input_controller.dispose();
+    super.dispose();
+  }
+
   void do_the_scan() async {
     var text = await service.scan(file_path);
     print(text);
@@ -122,14 +202,10 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     Widget left_part_widget;
-    if (loading_finished) {
-      left_part_widget = Text(
-        'You can click the right bottom button to select an image to start your OCR journey.',
-      );
-    } else {
-      left_part_widget = Text("Loading...");
-      return spinkit1;
-    }
+
+    left_part_widget = Text(
+      'You can click the right bottom button to select an image to start your OCR journey.',
+    );
 
     if (wating) {
       return spinkit2;
@@ -144,9 +220,6 @@ class _MyHomePageState extends State<MyHomePage> {
     );
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
       body: Center(
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,

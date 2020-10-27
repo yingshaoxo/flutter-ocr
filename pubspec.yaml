@@ -30,6 +30,8 @@ dependencies:
   google_nav_bar: ^3.1.0
   line_icons: ^0.2.0
   desktop_window: ^0.3.0
+  shared_preferences: ^0.5.12+2
+  provider: ^4.3.2+2
 
 
   # The following adds the Cupertino Icons font to your application.

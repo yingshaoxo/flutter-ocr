@@ -8,9 +8,13 @@ import 'package:line_icons/line_icons.dart';
 
 import 'package:desktop_window/desktop_window.dart';
 
+import 'package:provider/provider.dart';
+
 import 'server.dart';
+import 'database.dart';
 
 final service = Service();
+final database = Database();
 
 final spinkit1 = Scaffold(
     appBar: null,
@@ -35,16 +39,23 @@ final spinkit2 = Scaffold(
     ));
 
 Future<void> main(List<String> args) async {
+  await database.init();
+
   WidgetsFlutterBinding.ensureInitialized();
   await DesktopWindow.setMinWindowSize(Size(960, 640));
 
   service.say_hi();
-  runApp(MaterialApp(
-    title: 'Flutter OCR',
-    theme: ThemeData(
-      primarySwatch: Colors.purple,
+  runApp(MultiProvider(
+    providers: [
+      ChangeNotifierProvider(create: (context) => AppModel()),
+    ],
+    child: MaterialApp(
+      title: 'Flutter OCR',
+      theme: ThemeData(
+        primarySwatch: Colors.purple,
+      ),
+      home: MyApp(),
     ),
-    home: MyApp(),
   ));
 }
 
@@ -69,6 +80,7 @@ class _MyAppState extends State<MyApp> {
         print('Caught error: $e');
       }
     } else {}
+
     super.didChangeDependencies();
   }
 
@@ -98,68 +110,75 @@ class _TabsState extends State<Tabs> {
   static List<Widget> _widgetOptions = <Widget>[
     MyHomePage(),
     Text(
-      'Index 1: PDF',
+      'PDF',
       style: optionStyle,
     ),
     Text(
-      'Index 2: History',
+      'History',
       style: optionStyle,
     ),
   ];
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Flutter OCR'),
-      ),
-      body: Center(
-        child: _widgetOptions.elementAt(_selectedIndex),
-      ),
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(color: Colors.white, boxShadow: [
-          BoxShadow(blurRadius: 20, color: Colors.black.withOpacity(.1))
-        ]),
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 8),
-            child: GNav(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                gap: 0,
-                activeColor: Colors.white,
-                iconSize: 36,
-                padding: EdgeInsets.symmetric(horizontal: 150, vertical: 5),
-                duration: Duration(milliseconds: 800),
-                //tabBackgroundColor: Colors.grey[400],
-                tabBackgroundColor: Colors.purple,
-                //backgroundColor: Colors.purple,
-                color: Colors.purple,
-                tabs: [
-                  GButton(
-                    //borderRadius: BorderRadius.all(Radius.circular(5)),
-                    icon: LineIcons.image,
-                    text: 'Image',
-                  ),
-                  GButton(
-                    //borderRadius: BorderRadius.all(Radius.circular(5)),
-                    icon: LineIcons.file_pdf_o,
-                    text: 'PDF',
-                  ),
-                  GButton(
-                    icon: LineIcons.history,
-                    text: 'History',
-                  ),
-                ],
-                selectedIndex: _selectedIndex,
-                onTabChange: (index) {
-                  setState(() {
-                    _selectedIndex = index;
-                  });
-                }),
+    return Consumer<AppModel>(builder: (context, myModel, child) {
+      if (myModel.ui_loading) {
+        return spinkit2;
+      }
+
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text('Flutter OCR'),
+        ),
+        body: Center(
+          child: _widgetOptions.elementAt(_selectedIndex),
+        ),
+        bottomNavigationBar: Container(
+          decoration: BoxDecoration(color: Colors.white, boxShadow: [
+            BoxShadow(blurRadius: 20, color: Colors.black.withOpacity(.1))
+          ]),
+          child: SafeArea(
+            child: Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 15.0, vertical: 8),
+              child: GNav(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  gap: 0,
+                  activeColor: Colors.white,
+                  iconSize: 36,
+                  padding: EdgeInsets.symmetric(horizontal: 150, vertical: 5),
+                  duration: Duration(milliseconds: 800),
+                  //tabBackgroundColor: Colors.grey[400],
+                  tabBackgroundColor: Colors.purple,
+                  //backgroundColor: Colors.purple,
+                  color: Colors.purple,
+                  tabs: [
+                    GButton(
+                      //borderRadius: BorderRadius.all(Radius.circular(5)),
+                      icon: LineIcons.image,
+                      text: 'Image',
+                    ),
+                    GButton(
+                      //borderRadius: BorderRadius.all(Radius.circular(5)),
+                      icon: LineIcons.file_pdf_o,
+                      text: 'PDF',
+                    ),
+                    GButton(
+                      icon: LineIcons.history,
+                      text: 'History',
+                    ),
+                  ],
+                  selectedIndex: _selectedIndex,
+                  onTabChange: (index) {
+                    setState(() {
+                      _selectedIndex = index;
+                    });
+                  }),
+            ),
           ),
         ),
-      ),
-    );
+      );
+    });
   }
 }
 
@@ -174,9 +193,6 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   String file_path = "";
-  String detected_text = "";
-
-  bool wating = false;
 
   var input_controller;
 
@@ -190,13 +206,11 @@ class _MyHomePageState extends State<MyHomePage> {
     super.dispose();
   }
 
-  void do_the_scan() async {
+  void do_the_scan(dynamic myModel) async {
     var text = await service.scan(file_path);
     print(text);
-    setState(() {
-      detected_text = text;
-      wating = false;
-    });
+    database.detected_text = text;
+    myModel.ui_loading = false;
   }
 
   @override
@@ -207,71 +221,72 @@ class _MyHomePageState extends State<MyHomePage> {
       'You can click the right bottom button to select an image to start your OCR journey.',
     );
 
-    if (wating) {
-      return spinkit2;
-    }
-
     if (file_path != "") {
       left_part_widget = Image.file(new File(file_path));
     }
 
     input_controller.value = input_controller.value.copyWith(
-      text: detected_text,
+      text: database.detected_text,
     );
 
     return Scaffold(
-      body: Center(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Expanded(
+        body: Center(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Expanded(
+                  flex: 1,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [left_part_widget],
+                  )),
+              Expanded(
                 flex: 1,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [left_part_widget],
-                )),
-            Expanded(
-              flex: 1,
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: TextField(
-                    controller: input_controller,
-                    minLines: null,
-                    maxLines: null,
-                    expands: true,
-                    obscureText: false,
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(10)),
-                      ),
-                    )),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: TextField(
+                      controller: input_controller,
+                      minLines: null,
+                      maxLines: null,
+                      expands: true,
+                      obscureText: false,
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(10)),
+                        ),
+                      )),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          // show a dialog to open a file
-          try {
-            FilePickerCross myFile = await FilePickerCross.importFromStorage(
-              type: FileTypeCross
-                  .image, // Available: `any`, `audio`, `image`, `video`, `custom`. Note: not available using FDE
+        floatingActionButton: Consumer<AppModel>(
+          builder: (context, myModel, child) {
+            return FloatingActionButton(
+              onPressed: () async {
+                // show a dialog to open a file
+                try {
+                  FilePickerCross myFile =
+                      await FilePickerCross.importFromStorage(
+                    type: FileTypeCross
+                        .image, // Available: `any`, `audio`, `image`, `video`, `custom`. Note: not available using FDE
+                  );
+                  print(myFile.fileName);
+                  print(myFile.path);
+                  setState(() {
+                    file_path = myFile.path;
+                  });
+                  myModel.ui_loading = true;
+                  do_the_scan(myModel);
+                } catch (e) {
+                  print(e);
+                }
+              },
+              tooltip: 'Add files',
+              child: Icon(Icons.add),
             );
-            print(myFile.fileName);
-            print(myFile.path);
-            setState(() {
-              file_path = myFile.path;
-              wating = true;
-            });
-            do_the_scan();
-          } catch (e) {
-            print(e);
-          }
-        },
-        tooltip: 'Add files',
-        child: Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
-    );
+          },
+        ) // This trailing comma makes auto-formatting nicer for build methods.
+        );
   }
 }

@@ -1,7 +1,4 @@
-import 'package:file_picker_cross/file_picker_cross.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'dart:io';
 
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:line_icons/line_icons.dart';
@@ -12,31 +9,12 @@ import 'package:provider/provider.dart';
 
 import 'server.dart';
 import 'database.dart';
+import 'models.dart';
+import 'little_widgets.dart';
+import 'image_page.dart';
 
 final service = Service();
 final database = Database();
-
-final spinkit1 = Scaffold(
-    appBar: null,
-    backgroundColor: Colors.white,
-    body: SpinKitFadingCube(
-      size: 100,
-      itemBuilder: (BuildContext context, int index) {
-        return DecoratedBox(
-          decoration: BoxDecoration(
-            color: index.isEven ? Colors.red : Colors.green,
-          ),
-        );
-      },
-    ));
-
-final spinkit2 = Scaffold(
-    appBar: null,
-    backgroundColor: Colors.purple,
-    body: SpinKitRing(
-      size: 100,
-      color: Colors.white,
-    ));
 
 Future<void> main(List<String> args) async {
   await database.init();
@@ -48,6 +26,7 @@ Future<void> main(List<String> args) async {
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider(create: (context) => AppModel()),
+      ChangeNotifierProvider(create: (context) => ImagePageModel()),
     ],
     child: MaterialApp(
       title: 'Flutter OCR',
@@ -108,7 +87,7 @@ class _TabsState extends State<Tabs> {
   static const TextStyle optionStyle =
       TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
   static List<Widget> _widgetOptions = <Widget>[
-    MyHomePage(),
+    ImagePage(),
     Text(
       'PDF',
       style: optionStyle,
@@ -121,8 +100,8 @@ class _TabsState extends State<Tabs> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<AppModel>(builder: (context, myModel, child) {
-      if (myModel.ui_loading) {
+    return Consumer<AppModel>(builder: (context, appModel, child) {
+      if (appModel.ui_loading) {
         return spinkit2;
       }
 
@@ -179,114 +158,5 @@ class _TabsState extends State<Tabs> {
         ),
       );
     });
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  MyHomePage({
-    Key key,
-  }) : super(key: key);
-
-  @override
-  _MyHomePageState createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  String file_path = "";
-
-  var input_controller;
-
-  void initState() {
-    super.initState();
-    input_controller = TextEditingController();
-  }
-
-  void dispose() {
-    input_controller.dispose();
-    super.dispose();
-  }
-
-  void do_the_scan(dynamic myModel) async {
-    var text = await service.scan(file_path);
-    print(text);
-    database.detected_text = text;
-    myModel.ui_loading = false;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    Widget left_part_widget;
-
-    left_part_widget = Text(
-      'You can click the right bottom button to select an image to start your OCR journey.',
-    );
-
-    if (file_path != "") {
-      left_part_widget = Image.file(new File(file_path));
-    }
-
-    input_controller.value = input_controller.value.copyWith(
-      text: database.detected_text,
-    );
-
-    return Scaffold(
-        body: Center(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Expanded(
-                  flex: 1,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [left_part_widget],
-                  )),
-              Expanded(
-                flex: 1,
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: TextField(
-                      controller: input_controller,
-                      minLines: null,
-                      maxLines: null,
-                      expands: true,
-                      obscureText: false,
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(10)),
-                        ),
-                      )),
-                ),
-              ),
-            ],
-          ),
-        ),
-        floatingActionButton: Consumer<AppModel>(
-          builder: (context, myModel, child) {
-            return FloatingActionButton(
-              onPressed: () async {
-                // show a dialog to open a file
-                try {
-                  FilePickerCross myFile =
-                      await FilePickerCross.importFromStorage(
-                    type: FileTypeCross
-                        .image, // Available: `any`, `audio`, `image`, `video`, `custom`. Note: not available using FDE
-                  );
-                  print(myFile.fileName);
-                  print(myFile.path);
-                  setState(() {
-                    file_path = myFile.path;
-                  });
-                  myModel.ui_loading = true;
-                  do_the_scan(myModel);
-                } catch (e) {
-                  print(e);
-                }
-              },
-              tooltip: 'Add files',
-              child: Icon(Icons.add),
-            );
-          },
-        ) // This trailing comma makes auto-formatting nicer for build methods.
-        );
   }
 }

@@ -1,3 +1,4 @@
+import 'package:flutter_ocr/main.dart';
 import 'package:grpc/grpc.dart';
 import 'server.pb.dart';
 import 'server.pbgrpc.dart';
@@ -32,10 +33,11 @@ class Service {
     }
   }
 
-  Future<bool> load() async {
+  Future<bool> load(List<String> languages) async {
     bool status = false;
     try {
-      final response = await stub.load(TextRequest()..text = "");
+      final response =
+          await stub.load(TextRequest()..text = jsonEncode(languages));
       if (response.text == "ok") {
         return true;
       }

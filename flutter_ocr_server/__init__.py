@@ -22,8 +22,91 @@ class OCR():
     def __init__(self):
         self.reader = None
 
-    def get_ready(self):
-        self.reader = easyocr.Reader(['ch_sim', 'en'])
+        #{t.split("\t")[0]:t.split("\t")[1] for t in lists}
+        self.language_dict = {'Abaza': 'abq',
+                              'Adyghe': 'ady',
+                              'Afrikaans': 'af',
+                              'Angika': 'ang',
+                              'Arabic': 'ar',
+                              'Assamese': 'as',
+                              'Avar': 'ava',
+                              'Azerbaijani': 'az',
+                              'Belarusian': 'be',
+                              'Bulgarian': 'bg',
+                              'Bihari': 'bh',
+                              'Bhojpuri': 'bho',
+                              'Bengali': 'bn',
+                              'Bosnian': 'bs',
+                              'Simplified Chinese': 'ch_sim',
+                              'Traditional Chinese': 'ch_tra',
+                              'Chechen': 'che',
+                              'Czech': 'cs',
+                              'Welsh': 'cy',
+                              'Danish': 'da',
+                              'Dargwa': 'dar',
+                              'German': 'de',
+                              'English': 'en',
+                              'Spanish': 'es',
+                              'Estonian': 'et',
+                              'Persian (Farsi)': 'fa',
+                              'French': 'fr',
+                              'Irish': 'ga',
+                              'Goan Konkani': 'gom',
+                              'Hindi': 'hi',
+                              'Croatian': 'hr',
+                              'Hungarian': 'hu',
+                              'Indonesian': 'id',
+                              'Ingush': 'inh',
+                              'Icelandic': 'is',
+                              'Italian': 'it',
+                              'Japanese': 'ja',
+                              'Kabardian': 'kbd',
+                              'Korean': 'ko',
+                              'Kurdish': 'ku',
+                              'Latin': 'la',
+                              'Lak': 'lbe',
+                              'Lezghian': 'lez',
+                              'Lithuanian': 'lt',
+                              'Latvian': 'lv',
+                              'Magahi': 'mah',
+                              'Maithili': 'mai',
+                              'Maori': 'mi',
+                              'Mongolian': 'mn',
+                              'Marathi': 'mr',
+                              'Malay': 'ms',
+                              'Maltese': 'mt',
+                              'Nepali': 'ne',
+                              'Newari': 'new',
+                              'Dutch': 'nl',
+                              'Norwegian': 'no',
+                              'Occitan': 'oc',
+                              'Polish': 'pl',
+                              'Portuguese': 'pt',
+                              'Romanian': 'ro',
+                              'Russian': 'ru',
+                              'Serbian (cyrillic)': 'rs_cyrillic',
+                              'Serbian (latin)': 'rs_latin',
+                              'Nagpuri': 'sck',
+                              'Slovak (need revisit)': 'sk',
+                              'Slovenian': 'sl',
+                              'Albanian': 'sq',
+                              'Swedish': 'sv',
+                              'Swahili': 'sw',
+                              'Tamil': 'ta',
+                              'Tabassaran': 'tab',
+                              'Thai': 'th',
+                              'Tagalog': 'tl',
+                              'Turkish': 'tr',
+                              'Uyghur': 'ug',
+                              'Ukranian': 'uk',
+                              'Urdu': 'ur',
+                              'Uzbek': 'uz',
+                              'Vietnamese (need revisit)': 'vi'}
+
+    def get_ready(self, language_list):
+        print(language_list)
+        language_list = [self.language_dict[l] for l in language_list]
+        self.reader = easyocr.Reader(language_list)
 
     def _raw_to_mature(self, raw_list):
         raw_result = []
@@ -58,7 +141,8 @@ class Server(server_pb2_grpc.OCR_Service):
     def Load(self, request, context):
         try:
             print("loading...")
-            self.ocr.get_ready()
+            languages = json.loads(request.text)
+            self.ocr.get_ready(languages)
             print("loading finished...")
             return server_pb2.TextReply(text="ok")
         except Exception as e:

@@ -27,6 +27,5 @@ https://realpython.com/creating-modifying-pdf/#installing-reportlab
 
 ___
 
-https://pub.dev/packages/native_pdf_renderer
-https://pub.dev/packages/pdf
-https://pub.dev/packages/native_pdf_view
+* https://pub.dev/packages/native_pdf_view | https://pub.dev/packages/native_pdf_renderer
+* https://pub.dev/packages/pdf

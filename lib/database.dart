@@ -9,11 +9,11 @@ class Database {
     prefs = await SharedPreferences.getInstance();
   }
 
-  void set detected_text(String text) {
-    prefs.setString("detected_text", text);
+  void set language_list(List<String> text_list) {
+    prefs.setStringList("language_list", text_list);
   }
 
-  String get detected_text {
-    return prefs.getString("detected_text") ?? "";
+  List<String> get language_list {
+    return prefs.getStringList("language_list") ?? ["English"];
   }
 }

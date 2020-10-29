@@ -4,17 +4,23 @@ import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:line_icons/line_icons.dart';
 
 import 'package:desktop_window/desktop_window.dart';
+import 'package:multi_select_flutter/dialog/mult_select_dialog.dart';
+import 'package:multi_select_flutter/multi_select_flutter.dart';
 
 import 'package:provider/provider.dart';
 
+import 'languages.dart';
 import 'server.dart';
 import 'database.dart';
 import 'models.dart';
 import 'little_widgets.dart';
 import 'image_page.dart';
+import 'pdf_page.dart';
 
-final service = Service();
 final database = Database();
+final service = Service();
+
+//print("\n".join([t.split("\t")[0] for t in text.split("\n") if t.strip()!=""]))
 
 Future<void> main(List<String> args) async {
   await database.init();
@@ -50,7 +56,7 @@ class _MyAppState extends State<MyApp> {
   void didChangeDependencies() async {
     if (!loading_finished) {
       try {
-        if (await service.load()) {
+        if (await service.load(database.language_list)) {
           setState(() {
             loading_finished = true;
           });
@@ -98,6 +104,25 @@ class _TabsState extends State<Tabs> {
     ),
   ];
 
+  void _showMultiSelect(BuildContext context) async {
+    await showDialog(
+      context: context,
+      builder: (ctx) {
+        return MultiSelectDialog(
+          height: 320,
+          items: languages
+              .map((text) => MultiSelectItem<String>(text, text))
+              .toList(),
+          initialValue: database.language_list,
+          onConfirm: (values) {
+            print(values);
+            database.language_list = values;
+          },
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer<AppModel>(builder: (context, appModel, child) {
@@ -108,6 +133,38 @@ class _TabsState extends State<Tabs> {
       return Scaffold(
         appBar: AppBar(
           title: const Text('Flutter OCR'),
+        ),
+        drawer: Drawer(
+          child: ListView(
+            // Important: Remove any padding from the ListView.
+            padding: EdgeInsets.zero,
+            children: <Widget>[
+              DrawerHeader(
+                child: Center(child: Text('Menu')),
+                decoration: BoxDecoration(
+                  color: Colors.purpleAccent[100],
+                ),
+              ),
+              ListTile(
+                title: Text('Choose OCR Languages'),
+                onTap: () async {
+                  await _showMultiSelect(context);
+
+                  // Update the state of the app.
+                  // ...
+                  Navigator.pop(context);
+                },
+              ),
+              ListTile(
+                title: Text('About'),
+                onTap: () {
+                  // Update the state of the app.
+                  // ...
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          ), // Populate the Drawer in the next step.
         ),
         body: Center(
           child: _widgetOptions.elementAt(_selectedIndex),

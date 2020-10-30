@@ -16,6 +16,7 @@ import 'models.dart';
 import 'little_widgets.dart';
 import 'image_page.dart';
 import 'pdf_page.dart';
+import 'history_page.dart';
 
 final database = Database();
 final service = Service();
@@ -33,6 +34,7 @@ Future<void> main(List<String> args) async {
     providers: [
       ChangeNotifierProvider(create: (context) => AppModel()),
       ChangeNotifierProvider(create: (context) => ImagePageModel()),
+      ChangeNotifierProvider(create: (context) => HistoryPageModel()),
     ],
     child: MaterialApp(
       title: 'Flutter OCR',
@@ -98,10 +100,7 @@ class _TabsState extends State<Tabs> {
       'PDF',
       style: optionStyle,
     ),
-    Text(
-      'History',
-      style: optionStyle,
-    ),
+    HistoryPage(),
   ];
 
   void _showMultiSelect(BuildContext context) async {
@@ -118,6 +117,37 @@ class _TabsState extends State<Tabs> {
             print(values);
             database.language_list = values;
           },
+        );
+      },
+    );
+  }
+
+  Future<void> _showMyDialog() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('About'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text(''),
+                Text('This app was made by yingshaoxo'),
+                Text(''),
+                Text(
+                    'You can contact him by sending emails to yingshaoxo@gmail.com'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Thank You'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
         );
       },
     );
@@ -157,9 +187,8 @@ class _TabsState extends State<Tabs> {
               ),
               ListTile(
                 title: Text('About'),
-                onTap: () {
-                  // Update the state of the app.
-                  // ...
+                onTap: () async {
+                  await _showMyDialog();
                   Navigator.pop(context);
                 },
               ),

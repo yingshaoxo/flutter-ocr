@@ -1,3 +1,4 @@
+import 'package:clipboard/clipboard.dart';
 import 'package:file_picker_cross/file_picker_cross.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
@@ -25,10 +26,17 @@ class _ImagePageState extends State<ImagePage> {
   }
 
   @override
+  void didChangeDependencies() async {
+    super.didChangeDependencies();
+  }
+
+  @override
   Widget build(BuildContext context) {
     Widget left_part_widget;
 
     final myModel = Provider.of<ImagePageModel>(context, listen: false);
+    final historyPageModel =
+        Provider.of<HistoryPageModel>(context, listen: false);
 
     left_part_widget = Text(
       'You can click the right bottom button to select an image to start your OCR journey.',
@@ -46,6 +54,12 @@ class _ImagePageState extends State<ImagePage> {
           print(text);
           imagePageModel.ocr_text_result = text;
           appModel.ui_loading = false;
+
+          historyPageModel.add_to_history_list(new History(
+              imagePageModel.image_path, imagePageModel.ocr_text_result));
+
+          FlutterClipboard.copy(imagePageModel.ocr_text_result)
+              .then((value) => print('copied'));
         }
 
         return Scaffold(

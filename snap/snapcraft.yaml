@@ -21,7 +21,7 @@ parts:
     plugin: python
     python-version: python3
     source: .
-    python-packages: [torch, opencv-python, scipy, numpy, Pillow, scikit-image, python-bidi, easyocr, grpcio, protobuf]
+    python-packages: [torch, opencv-python, scipy, numpy, Pillow, scikit-image, python-bidi, easyocr, grpcio, protobuf, auto_everything]
     stage-packages:
       - libgomp1
         #build-packages:

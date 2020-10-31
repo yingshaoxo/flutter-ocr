@@ -53,10 +53,24 @@ class Service {
       final response = await stub.scan(TextRequest()..text = file_path);
       //Map<String, dynamic> data = jsonDecode(response.text);
       Map data = jsonDecode(response.text);
+      print(data);
       result = data["text"];
     } catch (e) {
       print(e);
     }
     return result;
+  }
+
+  Future<List<String>> get_images_from_service(String file_path) async {
+    List<String> results = [];
+    try {
+      await for (var reply
+          in stub.getImagesFromPDF(TextRequest()..text = file_path)) {
+        results.add(reply.text);
+      }
+    } catch (e) {
+      print(e);
+    }
+    return results;
   }
 }

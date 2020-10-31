@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto3',
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x0cserver.proto\"\x1b\n\x0bTextRequest\x12\x0c\n\x04text\x18\x01 \x01(\t\"\x19\n\tTextReply\x12\x0c\n\x04text\x18\x01 \x01(\t2z\n\x0bOCR_Service\x12#\n\x05Print\x12\x0c.TextRequest\x1a\n.TextReply\"\x00\x12\"\n\x04Load\x12\x0c.TextRequest\x1a\n.TextReply\"\x00\x12\"\n\x04Scan\x12\x0c.TextRequest\x1a\n.TextReply\"\x00\x62\x06proto3'
+  serialized_pb=b'\n\x0cserver.proto\"\x1b\n\x0bTextRequest\x12\x0c\n\x04text\x18\x01 \x01(\t\"\x19\n\tTextReply\x12\x0c\n\x04text\x18\x01 \x01(\t2\xac\x01\n\x0bOCR_Service\x12#\n\x05Print\x12\x0c.TextRequest\x1a\n.TextReply\"\x00\x12\"\n\x04Load\x12\x0c.TextRequest\x1a\n.TextReply\"\x00\x12\"\n\x04Scan\x12\x0c.TextRequest\x1a\n.TextReply\"\x00\x12\x30\n\x10GetImagesFromPDF\x12\x0c.TextRequest\x1a\n.TextReply\"\x00\x30\x01\x62\x06proto3'
 )
 
 
@@ -115,8 +115,8 @@ _OCR_SERVICE = _descriptor.ServiceDescriptor(
   index=0,
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_start=72,
-  serialized_end=194,
+  serialized_start=73,
+  serialized_end=245,
   methods=[
   _descriptor.MethodDescriptor(
     name='Print',
@@ -142,6 +142,16 @@ _OCR_SERVICE = _descriptor.ServiceDescriptor(
     name='Scan',
     full_name='OCR_Service.Scan',
     index=2,
+    containing_service=None,
+    input_type=_TEXTREQUEST,
+    output_type=_TEXTREPLY,
+    serialized_options=None,
+    create_key=_descriptor._internal_create_key,
+  ),
+  _descriptor.MethodDescriptor(
+    name='GetImagesFromPDF',
+    full_name='OCR_Service.GetImagesFromPDF',
+    index=3,
     containing_service=None,
     input_type=_TEXTREQUEST,
     output_type=_TEXTREPLY,

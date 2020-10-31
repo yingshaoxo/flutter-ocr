@@ -29,6 +29,11 @@ class OCR_ServiceStub(object):
                 request_serializer=server__pb2.TextRequest.SerializeToString,
                 response_deserializer=server__pb2.TextReply.FromString,
                 )
+        self.GetImagesFromPDF = channel.unary_stream(
+                '/OCR_Service/GetImagesFromPDF',
+                request_serializer=server__pb2.TextRequest.SerializeToString,
+                response_deserializer=server__pb2.TextReply.FromString,
+                )
 
 
 class OCR_ServiceServicer(object):
@@ -52,6 +57,12 @@ class OCR_ServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def GetImagesFromPDF(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_OCR_ServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -67,6 +78,11 @@ def add_OCR_ServiceServicer_to_server(servicer, server):
             ),
             'Scan': grpc.unary_unary_rpc_method_handler(
                     servicer.Scan,
+                    request_deserializer=server__pb2.TextRequest.FromString,
+                    response_serializer=server__pb2.TextReply.SerializeToString,
+            ),
+            'GetImagesFromPDF': grpc.unary_stream_rpc_method_handler(
+                    servicer.GetImagesFromPDF,
                     request_deserializer=server__pb2.TextRequest.FromString,
                     response_serializer=server__pb2.TextReply.SerializeToString,
             ),
@@ -126,6 +142,23 @@ class OCR_Service(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/OCR_Service/Scan',
+            server__pb2.TextRequest.SerializeToString,
+            server__pb2.TextReply.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def GetImagesFromPDF(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_stream(request, target, '/OCR_Service/GetImagesFromPDF',
             server__pb2.TextRequest.SerializeToString,
             server__pb2.TextReply.FromString,
             options, channel_credentials,

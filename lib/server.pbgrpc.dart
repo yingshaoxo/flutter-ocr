@@ -26,6 +26,11 @@ class OCR_ServiceClient extends $grpc.Client {
       '/OCR_Service/Scan',
       ($0.TextRequest value) => value.writeToBuffer(),
       ($core.List<$core.int> value) => $0.TextReply.fromBuffer(value));
+  static final _$getImagesFromPDF =
+      $grpc.ClientMethod<$0.TextRequest, $0.TextReply>(
+          '/OCR_Service/GetImagesFromPDF',
+          ($0.TextRequest value) => value.writeToBuffer(),
+          ($core.List<$core.int> value) => $0.TextReply.fromBuffer(value));
 
   OCR_ServiceClient($grpc.ClientChannel channel, {$grpc.CallOptions options})
       : super(channel, options: options);
@@ -49,6 +54,14 @@ class OCR_ServiceClient extends $grpc.Client {
     final call = $createCall(_$scan, $async.Stream.fromIterable([request]),
         options: options);
     return $grpc.ResponseFuture(call);
+  }
+
+  $grpc.ResponseStream<$0.TextReply> getImagesFromPDF($0.TextRequest request,
+      {$grpc.CallOptions options}) {
+    final call = $createCall(
+        _$getImagesFromPDF, $async.Stream.fromIterable([request]),
+        options: options);
+    return $grpc.ResponseStream(call);
   }
 }
 
@@ -77,6 +90,13 @@ abstract class OCR_ServiceBase extends $grpc.Service {
         false,
         ($core.List<$core.int> value) => $0.TextRequest.fromBuffer(value),
         ($0.TextReply value) => value.writeToBuffer()));
+    $addMethod($grpc.ServiceMethod<$0.TextRequest, $0.TextReply>(
+        'GetImagesFromPDF',
+        getImagesFromPDF_Pre,
+        false,
+        true,
+        ($core.List<$core.int> value) => $0.TextRequest.fromBuffer(value),
+        ($0.TextReply value) => value.writeToBuffer()));
   }
 
   $async.Future<$0.TextReply> print_Pre(
@@ -94,10 +114,17 @@ abstract class OCR_ServiceBase extends $grpc.Service {
     return scan(call, await request);
   }
 
+  $async.Stream<$0.TextReply> getImagesFromPDF_Pre(
+      $grpc.ServiceCall call, $async.Future<$0.TextRequest> request) async* {
+    yield* getImagesFromPDF(call, await request);
+  }
+
   $async.Future<$0.TextReply> print(
       $grpc.ServiceCall call, $0.TextRequest request);
   $async.Future<$0.TextReply> load(
       $grpc.ServiceCall call, $0.TextRequest request);
   $async.Future<$0.TextReply> scan(
+      $grpc.ServiceCall call, $0.TextRequest request);
+  $async.Stream<$0.TextReply> getImagesFromPDF(
       $grpc.ServiceCall call, $0.TextRequest request);
 }

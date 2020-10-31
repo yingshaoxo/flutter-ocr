@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:clipboard/clipboard.dart';
 import 'dart:convert';
 import 'main.dart';
 
 class AppModel extends ChangeNotifier {
   /// Internal, private state of the cart.
   bool _uiLoading = false;
+  int _tabIndex = 0;
+
+  AppModel() {
+    _tabIndex = database.tab_index;
+  }
 
   bool get ui_loading {
     return _uiLoading;
@@ -14,6 +20,32 @@ class AppModel extends ChangeNotifier {
     _uiLoading = value;
 
     notifyListeners();
+  }
+
+  int get tab_index {
+    return _tabIndex;
+  }
+
+  void set tab_index(int value) {
+    _tabIndex = value;
+    database.tab_index = _tabIndex;
+
+    notifyListeners();
+  }
+
+  Future<void> do_a_scan(String path, AppModel appModel,
+      ImagePageModel imagePageModel, HistoryPageModel historyPageModel) async {
+    appModel.ui_loading = true;
+    imagePageModel.image_path = path;
+    imagePageModel.ocr_text_result =
+        await service.scan(imagePageModel.image_path);
+    appModel.ui_loading = false;
+
+    historyPageModel.add_to_history_list(
+        new History(imagePageModel.image_path, imagePageModel.ocr_text_result));
+
+    FlutterClipboard.copy(imagePageModel.ocr_text_result)
+        .then((value) => print('copied'));
   }
 }
 
@@ -45,11 +77,6 @@ class ImagePageModel extends ChangeNotifier {
     );
     notifyListeners();
   }
-
-  //void dispose() {
-  //  input_controller.dispose();
-  //  super.dispose();
-  //}
 }
 
 class History {
@@ -106,5 +133,36 @@ class HistoryPageModel extends ChangeNotifier {
   void remove_one_from_history_list(History history) {
     _historyList.remove(history);
     save_history_list();
+  }
+}
+
+class PDFPageModel extends ChangeNotifier {
+  String _pdfPath = "";
+  List<String> _images = [];
+
+  String get pdf_path {
+    return _pdfPath;
+  }
+
+  void set pdf_path(String value) {
+    _pdfPath = value;
+
+    update_images_from_server();
+  }
+
+  Future<void> set_pdf_path(String value) async {
+    _pdfPath = value;
+
+    await update_images_from_server();
+  }
+
+  List<String> get images {
+    return _images;
+  }
+
+  Future<void> update_images_from_server() async {
+    _images = await service.get_images_from_service(_pdfPath);
+
+    notifyListeners();
   }
 }

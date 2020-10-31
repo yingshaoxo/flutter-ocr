@@ -6,7 +6,7 @@
 #sudo systemctl start snap.multipass.multipassd.service
 #
 name: flutter-ocr
-version: '1.0'
+version: '1.1'
 summary: Let's release the OCR power of Python with the support of flutter.
 description: This is an app to help you convert image to text by using Deep Learning OCR techs.
 
@@ -21,9 +21,10 @@ parts:
     plugin: python
     python-version: python3
     source: .
-    python-packages: [torch, opencv-python, scipy, numpy, Pillow, scikit-image, python-bidi, easyocr, grpcio, protobuf, auto_everything]
+    python-packages: [torch, opencv-python, scipy, numpy, Pillow, scikit-image, python-bidi, easyocr, grpcio, protobuf, auto_everything, pdf2image]
     stage-packages:
       - libgomp1
+      - poppler-utils
         #build-packages:
         #  - libcrystalhd-dev
         #  - nvidia-cuda-dev

@@ -50,10 +50,12 @@ class _HistoryPageState extends State<HistoryPage> {
     final historyPageModel =
         Provider.of<HistoryPageModel>(context, listen: false);
 
+    lists = new List.from(lists.reversed);
+
     return Container(
       child: lists.isNotEmpty
           ? ListView.builder(
-              reverse: true,
+              reverse: false,
               shrinkWrap: true,
               itemCount: lists.length,
               itemBuilder: (BuildContext context, int index) {

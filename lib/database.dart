@@ -25,4 +25,12 @@ class Database {
   String get history_list {
     return prefs.getString("history_list") ?? "";
   }
+
+  void set tab_index(int value) {
+    prefs.setInt("tab_index", value);
+  }
+
+  int get tab_index {
+    return prefs.getInt("tab_index") ?? 0;
+  }
 }

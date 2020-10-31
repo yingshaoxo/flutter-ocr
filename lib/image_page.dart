@@ -1,4 +1,3 @@
-import 'package:clipboard/clipboard.dart';
 import 'package:file_picker_cross/file_picker_cross.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
@@ -49,19 +48,6 @@ class _ImagePageState extends State<ImagePage> {
     return Consumer<AppModel>(builder: (context, appModel, child) {
       return Consumer<ImagePageModel>(
           builder: (context, imagePageModel, child) {
-        void do_the_scan() async {
-          var text = await service.scan(imagePageModel.image_path);
-          print(text);
-          imagePageModel.ocr_text_result = text;
-          appModel.ui_loading = false;
-
-          historyPageModel.add_to_history_list(new History(
-              imagePageModel.image_path, imagePageModel.ocr_text_result));
-
-          FlutterClipboard.copy(imagePageModel.ocr_text_result)
-              .then((value) => print('copied'));
-        }
-
         return Scaffold(
           body: Center(
             child: Row(
@@ -104,9 +90,8 @@ class _ImagePageState extends State<ImagePage> {
                 );
                 print(myFile.fileName);
                 print(myFile.path);
-                imagePageModel.image_path = myFile.path;
-                appModel.ui_loading = true;
-                do_the_scan();
+                await appModel.do_a_scan(
+                    myFile.path, appModel, imagePageModel, historyPageModel);
               } catch (e) {
                 print(e);
               }

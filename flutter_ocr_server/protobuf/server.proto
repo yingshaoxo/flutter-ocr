@@ -6,7 +6,7 @@ service OCR_Service {
   rpc Print (TextRequest) returns (TextReply) {}
   rpc Load (TextRequest) returns (TextReply) {}
   rpc Scan (TextRequest) returns (TextReply) {}
-  //rpc GetAudio (AudioInfo) returns (stream Audio) {}
+  rpc GetImagesFromPDF (TextRequest) returns (stream TextReply) {}
 }
 
 message TextRequest {
@@ -16,11 +16,3 @@ message TextRequest {
 message TextReply {
   string text = 1;
 }
-
-//message Audio {
-//  bytes data = 1;
-//}
-//
-//message AudioInfo {
-//  float length = 1; //second
-//}

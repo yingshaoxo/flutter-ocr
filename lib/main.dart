@@ -35,6 +35,7 @@ Future<void> main(List<String> args) async {
       ChangeNotifierProvider(create: (context) => AppModel()),
       ChangeNotifierProvider(create: (context) => ImagePageModel()),
       ChangeNotifierProvider(create: (context) => HistoryPageModel()),
+      ChangeNotifierProvider(create: (context) => PDFPageModel()),
     ],
     child: MaterialApp(
       title: 'Flutter OCR',
@@ -91,15 +92,11 @@ class Tabs extends StatefulWidget {
 }
 
 class _TabsState extends State<Tabs> {
-  int _selectedIndex = 0;
   static const TextStyle optionStyle =
       TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
   static List<Widget> _widgetOptions = <Widget>[
     ImagePage(),
-    Text(
-      'PDF',
-      style: optionStyle,
-    ),
+    PDFPage(),
     HistoryPage(),
   ];
 
@@ -196,7 +193,7 @@ class _TabsState extends State<Tabs> {
           ), // Populate the Drawer in the next step.
         ),
         body: Center(
-          child: _widgetOptions.elementAt(_selectedIndex),
+          child: _widgetOptions.elementAt(appModel.tab_index),
         ),
         bottomNavigationBar: Container(
           decoration: BoxDecoration(color: Colors.white, boxShadow: [
@@ -233,11 +230,9 @@ class _TabsState extends State<Tabs> {
                       text: 'History',
                     ),
                   ],
-                  selectedIndex: _selectedIndex,
+                  selectedIndex: appModel.tab_index,
                   onTabChange: (index) {
-                    setState(() {
-                      _selectedIndex = index;
-                    });
+                    appModel.tab_index = index;
                   }),
             ),
           ),

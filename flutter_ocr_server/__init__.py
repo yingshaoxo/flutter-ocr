@@ -8,6 +8,14 @@ import grpc
 import easyocr
 import json
 import numpy as np
+from time import sleep
+
+from pdf2image import convert_from_path
+
+from auto_everything.disk import Disk
+from auto_everything.base import Terminal
+disk = Disk()
+t = Terminal()
 
 server = None
 
@@ -128,6 +136,28 @@ class OCR():
     def scan(self, file_path):
         return self._raw_to_mature(self.reader.readtext(file_path))
 
+    def handle_a_pdf(self, file_path):
+        print(file_path)
+        hash_tag = disk.get_hash_of_a_file(file_path)
+        hash_tag = hash_tag[:10]
+        root_folder = t.run_command("echo ~/.flutter_ocr")
+        if not disk.exists(root_folder):
+            t.run_command(f"mkdir -p {root_folder}")
+        pdf_folder = t.run_command("echo ~/.flutter_ocr/pdf")
+        if not disk.exists(pdf_folder):
+            t.run_command(f"mkdir -p {pdf_folder}")
+        working_folder = t.run_command(f"echo ~/.flutter_ocr/pdf/{hash_tag}")
+        print(working_folder)
+        if not disk.exists(working_folder):
+            t.run_command(f"mkdir -p {working_folder}")
+            convert_from_path(file_path, output_folder=working_folder, fmt="jpeg")
+        #sleep(2)
+        print("done")
+        files = disk.get_files(working_folder, type_limiter=[".jpg"])
+        files.sort()
+        return files
+
+
 
 class Server(server_pb2_grpc.OCR_Service):
     def __init__(self):
@@ -155,6 +185,11 @@ class Server(server_pb2_grpc.OCR_Service):
         print(result)
         print("scaning finished...")
         return server_pb2.TextReply(text=result)
+
+    def GetImagesFromPDF(self, request, context):
+        list_of_image_path = self.ocr.handle_a_pdf(request.text)
+        for path in list_of_image_path:
+            yield server_pb2.TextReply(text=path)
 
     def start(self):
         global server, reader
